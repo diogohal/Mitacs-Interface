@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroForecasting</title>
+</head>
+<body>
+    <h1>Hydrological Forecasting</h1>
+    <h2>Data configuration</h2>
+    <form action="/configure" method="post">
+        <h3>Select the dates for the dataset</h3>
+        <label for="start_date">Start date:</label>
+        <input type="date" id="start_date" name="start_date" value="2021-04-01" min="2015-01-01" max="2023-12-31" />
+        <label for="end_date">End date:</label>
+        <input type="date" id="end_date" name="end_date" value="2021-11-30" min="2015-01-01" max="2023-12-31" />
+
+        <h3>Select the method for filling missing values</h3>
+        <select name="method" id="method">
+            <option value="interpolation">Interpolation</option>
+            <option value="fill0">Fill0</option>
+            <option value="splitequally">Split equally</option>
+        </select>
+        <h3>Select the method of splitting the dataset</h3>
+        <select name="splitdf" id="splitdf">
+            <option value="continuous">Continuous timeseries</option>
+            <option value="strided">Strided timeseries</option>
+        </select>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Model configuration</h2>
+    <form>
+        <label for="epochs">Epochs: </label>
+        <input type="number" id="epochs" name="epochs" value="20">
+        <br/>
+        <label for="lstm_units">LSTM units: </label>
+        <input type="number" id="lstm_units" name="lstm_units" value="64">
+        <br/>
+        <label for="dense1_units">DENSE1 units: </label>
+        <input type="number" id="dense1_units" name="dense1_units" value="32">
+        <br/>
+        <label for="dense2_units">DENSE2 units: </label>
+        <input type="number" id="dense2_units" name="dense2_units" value="32">
+    </form>
+</body>
+</html>
