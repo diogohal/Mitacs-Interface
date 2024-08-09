@@ -114,7 +114,7 @@ class DataPreprocessor:
         self.windows = windows
         self.labels = labels
 
-    def strided_dataset(dates, windows, labels, train_size, test_size, val_size):
+    def strided_dataset(self, dates, windows, labels, train_size, test_size, val_size):
         dates_train, dates_test, dates_val = [], [], []
         windows_train, windows_test, windows_val = [], [], []
         labels_train, labels_test, labels_val = [], [], []

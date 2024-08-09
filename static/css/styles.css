@@ -1,0 +1,9 @@
+.dataconf_dates_inputs {
+    display: flex;
+    flex-direction: row;
+}
+
+.dataconf_methods_inputs {
+    display: flex;
+    flex-direction: row;
+}

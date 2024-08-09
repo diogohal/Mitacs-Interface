@@ -1,65 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HydroForecasting</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HydroForecasting</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
 </head>
 <body>
-    <h1>Hydrological Forecasting</h1>
-    <h2>Data preprocessing</h2>
-    <form action="/configure" method="post">
-        <h3>Select the dates for the dataset</h3>
-        <label for="start_date">Start date:</label>
-        <input type="date" id="start_date" name="start_date" value="2021-04-01" min="2015-01-01" max="2023-12-31" />
-        <label for="end_date">End date:</label>
-        <input type="date" id="end_date" name="end_date" value="2021-11-30" min="2015-01-01" max="2023-12-31" />
+    <header>
+        <h1>Hydrological Forecasting</h1>
+    </header>
+    <section class="dataconf">
+        <h2>Data preprocessing</h2>
+        <form action="/configure" method="post">
+            <h3>Select the options for data preprocessing configuration</h3>
+            <div class="dataconf_dates">
+                <div class="dataconf_dates_inputs">
+                    <div class="dataconf_dates_inputs_element">
+                        <label for="start_date">Start date:</label>
+                        <input type="date" id="start_date" name="start_date" value="2021-04-01" min="2015-01-01" max="2023-12-31" />
+                    </div>
+                    <div class="dataconf_dates_inputs_end_element">
+                        <label for="end_date">End date:</label>
+                        <input type="date" id="end_date" name="end_date" value="2021-11-30" min="2015-01-01" max="2023-12-31" />
+                    </div>
+                </div>
+            </div>
+            
+            <div name="dataconf_methods">
+                <div class="dataconf_methods_inputs">
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="method">Select the method for filling missing values</label>
+                        <select name="method" id="method">
+                            <option value="interpolation">Interpolation</option>
+                            <option value="fill0">Fill0</option>
+                            <option value="equal_dis">Split equally</option>
+                        </select>
+                    </div>
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="splitdf">Select the method of splitting the dataset</label>
+                        <select name="splitdf" id="splitdf">
+                            <option value="continuous">Continuous timeseries</option>
+                            <option value="striped">Strided timeseries</option>
+                        </select>
+                    </div>
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="window_size">window_size: </label>
+                        <input type="number" id="window_size", name="window_size", value="20", min="5", max="100"/>
+                    </div>
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="shift">shift: </label>
+                        <input type="number" id="shift", name="shift", value="1", min="1", max="1000"/>
+                    </div>
+                        
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="label_size">label_size: </label>
+                        <input type="number" id="label_size", name="label_size", value="1", min="1", max="100"/>
+                    </div>
+                    
+                    <div class="dataconf_methods_inputs_element">
+                        <label for="steps_future">steps_future: </label>
+                        <input type="number" id="steps_future", name="steps_future", value="0", min="0", max="100"/>
+                    </div>
+                </div>
+            </div>
 
-        <h3>Select the method for filling missing values</h3>
-        <select name="method" id="method">
-            <option value="interpolation">Interpolation</option>
-            <option value="fill0">Fill0</option>
-            <option value="equal_dis">Split equally</option>
-        </select>
-        <h3>Select the method of splitting the dataset</h3>
-        <select name="splitdf" id="splitdf">
-            <option value="continuous">Continuous timeseries</option>
-            <option value="striped">Strided timeseries</option>
-        </select>
-        <h3>Select the windows configuration</h3>
-        <label for="window_size">window_size: </label>
-        <input type="number" id="window_size", name="window_size", value="20", min="5", max="100"/>
+            <input type="submit" value="Preprocess data">
+        </form>
 
-        <label for="shift">shift: </label>
-        <input type="number" id="shift", name="shift", value="1", min="1", max="1000"/>
-
-        <label for="label_size">label_size: </label>
-        <input type="number" id="label_size", name="label_size", value="1", min="1", max="100"/>
-
-        <label for="steps_future">steps_future: </label>
-        <input type="number" id="steps_future", name="steps_future", value="0", min="0", max="100"/>
-
-        <input type="submit" value="Preprocess data">
-    </form>
-
-    {% if preprocess %}
+        {% if preprocess %}
         <h4>Data processed!</h4>
-    {% endif %}
+        {% endif %}    
+    </section>
 
     <h2>Model configuration</h2>
+
+    <h3>Layers configuration</h3>
+    <form action="/layer_conf" method="post">
+        <label for="layer_type">Layer: </label>
+        <select name="layer_type" id="layer_type">
+            <option value="lstm">LSTM</option>
+            <option value="dense">Dense</option>
+        </select>
+
+        <label for="layer_units">Units: </label>
+        <input type="number" id="layer_units" name="layer_units" value="32">
+
+        <input type="submit" value="Add layer">
+    </form>
+    <form action="/layer_reset" method="post">
+        <input type="submit" value="Reset layers">
+    </form>
+
+    {% for layer in layers %}
+            <li>{{ layer[0] }}: {{ layer[1] }} units</li>
+    {% endfor %}
+
+
     <form action="/configure_model" method="post">
         <label for="epochs">Epochs: </label>
         <input type="number" id="epochs" name="epochs" value="20">
-        <br/>
-        <label for="lstm_units">LSTM units: </label>
-        <input type="number" id="lstm_units" name="lstm_units" value="64">
-        <br/>
-        <label for="dense1_units">DENSE1 units: </label>
-        <input type="number" id="dense1_units" name="dense1_units" value="32">
-        <br/>
-        <label for="dense2_units">DENSE2 units: </label>
-        <input type="number" id="dense2_units" name="dense2_units" value="32">
-
         <input type="submit" value="Configure model">
     </form>
 
@@ -67,16 +109,66 @@
         <h4>Model configured!</h4>
     {% endif %}
 
+    
+    <h4>Preview training configuration</h4>
+
+    {% for key, value in data_conf.items() %}
+        {% if key != 'data' %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endif %}
+    {% endfor %}
+    
+    {% for key, value in model_conf.items() %}
+        {% if key != 'hydro' %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endif %}
+    {% endfor %}
+    
     <form action="/add_model" method="post">
         <label for="model_name">Output filename: </label>
         <input type="text" id="model_name" name="model_name" value="model">
         <input type="submit" value="Add model">
     </form>
-    
+
     <form action="train_model" method="post">
         <input type="submit" value="Train models">
     </form>
+
     <h4>Models on queue: {{ qt_models }}</h4>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Method</th>
+                <th>Split DF</th>
+                <th>Window Size</th>
+                <th>Label Size</th>
+                <th>Shift</th>
+                <th>Steps Future</th>
+                <th>Epochs</th>
+                <th>Layers</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for train in train_list %}
+            <tr>
+                <td>{{ train[1]['start_date'] }}</td>
+                <td>{{ train[1]['end_date'] }}</td>
+                <td>{{ train[1]['method'] }}</td>
+                <td>{{ train[1]['splitdf'] }}</td>
+                <td>{{ train[1]['window_size'] }}</td>
+                <td>{{ train[1]['label_size'] }}</td>
+                <td>{{ train[1]['shift'] }}</td>
+                <td>{{ train[1]['steps_future'] }}</td>
+                <td>{{ train[0]['epochs'] }}</td>
+                <td>{{ train[0]['layers'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+     
 
 </body>
 </html>

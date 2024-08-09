@@ -10,13 +10,17 @@ class HydroModel:
   def __init__(self):
     self.model = None
 
-  def build(self, input_shape, output_shape, lstm_units, dense1_units, dense2_units):
+  def build(self, input_shape, output_shape, layers):
     self.model = Sequential()
     self.model.add(InputLayer(shape=input_shape))
-    self.model.add(LSTM(lstm_units))
-    self.model.add(Dense(dense1_units, activation='relu'))
-    self.model.add(Dense(dense2_units, activation='relu'))
-    self.model.add(Dense(output_shape))
+    
+    for layer in layers:
+      if layer[0] == 'lstm':
+        self.model.add(LSTM(layer[1]))
+      else:
+        self.model.add(Dense(layer[1], activation='relu'))
+    self.model.add(Dense(output_shape))    
+    
 
   def compile(self):
     self.model.compile(loss=MeanSquaredError(), optimizer=Adam(learning_rate=0.0001), metrics=[RootMeanSquaredError()])
