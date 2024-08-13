@@ -1,6 +1,3 @@
-aaa = {
-    'teste':1,
-    'teste2':2
-}
+filepath = 'Models/model1/model1.keras'
 
-print(aaa[1:])
+print(filepath.split('/')[-2:])

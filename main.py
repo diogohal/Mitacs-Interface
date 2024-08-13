@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from Models.data_preprocessor import DataPreprocessor
 from Models.modeling import HydroModel
+from tensorflow.keras.models import load_model
 import os
 import copy
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -82,7 +83,8 @@ def add_model():
     global model_conf
 
     model_name = request.form.get('model_name')
-    cp = ModelCheckpoint(f'Models/{model_name}.keras', save_best_only=True)
+    cp = ModelCheckpoint(f'Results/{model_name}/{model_name}.keras', save_best_only=True)
+    print(cp.filepath)
     train_list.append([copy.deepcopy(model_conf), copy.deepcopy(data_conf), cp])
     print(train_list)
     return render_template('index.html', model_conf=model_conf, data_conf=data_conf, qt_models=len(train_list), layers=model_conf['layers'], model_training=True, train_list=train_list)
@@ -95,7 +97,29 @@ def train_model():
 
     for m in train_list:
         m[0]['hydro'].train(m[1]['data'].train_windows, m[1]['data'].train_labels, (m[1]['data'].val_windows, m[1]['data'].val_labels), m[0]['epochs'], m[2])
-    
+        
+        folder_path = os.path.dirname(m[2].filepath)
+        model_load = load_model(m[2].filepath)
+        test_result = model_load.evaluate(m[1]['data'].test_windows, m[1]['data'].test_labels)
+        predictions = model_load.predict(m[1]['data'].test_windows)
+
+        # Write important features about the model        
+        with open(f'{folder_path}/configuration.txt', 'w') as file:
+            for key, value in data_conf.items():
+                file.write(f'{key}: {value}\n')
+            file.write(f'Epochs: {model_conf["epochs"]}\n')
+            file.write(f'layers: {model_conf["layers"]}\n')
+            file.write(f'Loss: {test_result[0]}   Score: {test_result[1]}')
+        with open(f'{folder_path}/test_windows.txt', 'w') as file:
+            for item in m[1]['data'].test_windows:
+                file.write(f'{item}\n')
+        with open(f'{folder_path}/test_labels.txt', 'w') as file:
+            for item in m[1]['data'].test_labels:
+                file.write(f'{item}\n')
+        with open(f'{folder_path}/predictions.txt', 'w') as file:
+            for item in predictions:
+                file.write(f'{item}\n')
+        
     train_list = []
     return render_template('index.html', model_conf=model_conf, data_conf=data_conf, qt_models=len(train_list), layers=model_conf['layers'], train_list=train_list)
 

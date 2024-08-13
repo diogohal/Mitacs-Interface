@@ -1,0 +1,12 @@
+data: <Models.data_preprocessor.DataPreprocessor object at 0x7b46dbfba2d0>
+start_date: 2021-04-01
+end_date: 2021-11-30
+method: interpolation
+splitdf: continuous
+window_size: 20
+label_size: 1
+shift: 1
+steps_future: 0
+Epochs: 1
+layers: [['lstm', 64], ['dense', 32], ['dense', 32]]
+Loss: 3.0452118153334595e-05   Score: 0.005518343765288591
